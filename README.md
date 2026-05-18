@@ -7,10 +7,17 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen)](package.json)
 
-<img src="screenshots/male_front_default.png" width="200" style="display: inline" alt="Male Front — Default style">
-  <img src="screenshots/female_front_neon.png" width="200" style="display: inline" alt="Female Front — Neon style with selection">
-  <img src="screenshots/male_heatmap_workout.png" width="170" style="display: inline" alt="Male Front — Workout heatmap">
-  <img src="screenshots/male_back_medical.png" width="170" style="display: inline" alt="Male Back — Medical style">
+<table>
+  <tr>
+    <td><img src="screenshots/male_front_default.png" width="200" alt="Male Front — Default style"></td>
+    <td><img src="screenshots/female_front_neon.png" width="200" alt="Female Front — Neon style with selection"></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/male_heatmap_workout.png" width="170" style="display: inline" alt="Male Front — Workout heatmap"></td>
+    <td><img src="screenshots/male_back_medical.png" width="170" style="display: inline" alt="Male Back — Medical style"></td>
+  </tr>
+</table>
+
 
 ---
 
