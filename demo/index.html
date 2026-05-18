@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuscleMapJS — Interactive Demo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0f1117;
+      color: #e1e4e8;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00e5ff, #7c4dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header .subtitle {
+      font-size: 13px;
+      color: #666;
+      font-weight: 400;
+    }
+
+    .controls {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .controls button {
+      padding: 7px 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #c9d1d9;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .controls button:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .controls button.active {
+      background: rgba(124,77,255,0.15);
+      border-color: #7c4dff;
+      color: #b39dff;
+    }
+
+    .controls .sep {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 4px;
+    }
+
+    .main {
+      display: flex;
+      gap: 0;
+      height: calc(100vh - 65px);
+    }
+
+    .map-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .map-wrapper {
+      width: 100%;
+      max-width: 420px;
+      height: calc(100vh - 170px);
+      max-height: 680px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .legend-wrapper {
+      width: 100%;
+      max-width: 420px;
+      height: 36px;
+      margin-top: 12px;
+      padding: 0 8px;
+    }
+
+    .sidebar {
+      width: 320px;
+      border-left: 1px solid rgba(255,255,255,0.06);
+      padding: 20px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.01);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar h2 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .muscle-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .muscle-chip {
+      padding: 7px 10px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease;
+    }
+
+    .muscle-chip.selected {
+      background: rgba(0,200,83,0.1);
+      border-color: rgba(0,200,83,0.3);
+      color: #69f0ae;
+    }
+
+    .muscle-chip .badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(0,200,83,0.15);
+      color: #69f0ae;
+    }
+
+    .info-row {
+      font-size: 12px;
+      color: #555;
+      padding: 6px 0;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-row button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-save {
+      background: linear-gradient(135deg, #00c853, #00e676);
+      color: #0a2011;
+    }
+    .btn-save:hover {
+      box-shadow: 0 4px 20px rgba(0,200,83,0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-action {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      color: #8b949e;
+    }
+    .btn-action:hover { background: rgba(255,255,255,0.08); }
+    .btn-action:disabled { opacity: 0.3; cursor: default; }
+
+    .btn-heatmap {
+      background: linear-gradient(135deg, #ff6d00, #f44336);
+      color: white;
+    }
+    .btn-heatmap:hover { box-shadow: 0 4px 16px rgba(255,109,0,0.3); }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      accent-color: #7c4dff;
+      width: 14px;
+      height: 14px;
+    }
+
+    .output {
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.3);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #69f0ae;
+      word-break: break-all;
+      max-height: 100px;
+      overflow-y: auto;
+      display: none;
+    }
+    .output.visible { display: block; }
+
+    select {
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #c9d1d9;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: inherit;
+    }
+
+    @media (max-width: 800px) {
+      .main { flex-direction: column; }
+      .sidebar { width: 100%; border-left: none; border-top: 1px solid rgba(255,255,255,0.06); max-height: 300px; }
+      .map-wrapper { max-height: 400px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>MuscleMapJS</h1>
+      <span class="subtitle">Interactive Human Body Muscle Map — JavaScript SDK</span>
+    </div>
+    <div class="controls">
+      <button id="btn-male" class="active" onclick="setGender('male')">Male</button>
+      <button id="btn-female" onclick="setGender('female')">Female</button>
+      <div class="sep"></div>
+      <button id="btn-front" class="active" onclick="setSide('front')">Front</button>
+      <button id="btn-back" onclick="setSide('back')">Back</button>
+      <div class="sep"></div>
+      <button id="btn-style-default" class="active" onclick="setStyle('default')">Default</button>
+      <button id="btn-style-neon" onclick="setStyle('neon')">Neon</button>
+      <button id="btn-style-medical" onclick="setStyle('medical')">Medical</button>
+      <button id="btn-style-minimal" onclick="setStyle('minimal')">Minimal</button>
+      <div class="sep"></div>
+      <select id="locale-select" onchange="changeLocale(this.value)">
+        <option value="en">🇬🇧 English</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="pt-BR">🇧🇷 Português</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="tr">🇹🇷 Türkçe</option>
+        <option value="zh-Hans">🇨🇳 中文</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="map-container">
+      <div class="map-wrapper" id="muscle-map"></div>
+      <div class="legend-wrapper" id="heatmap-legend" style="display:none;"></div>
+    </div>
+    <div class="sidebar">
+      <div>
+        <h2>Selected Muscles</h2>
+        <div class="muscle-list" id="muscle-list">
+          <div class="info-row">Click on the body to select muscles</div>
+        </div>
+      </div>
+
+      <div>
+        <h2>Actions</h2>
+        <div class="btn-row">
+          <button class="btn-save" onclick="handleSave()">💾 Save</button>
+          <button class="btn-action" onclick="handleClear()">Clear</button>
+          <button class="btn-action" onclick="handleRestore()">Restore</button>
+          <button class="btn-action" id="btn-undo" onclick="handleUndo()" disabled>↩ Undo</button>
+          <button class="btn-action" id="btn-redo" onclick="handleRedo()" disabled>↪ Redo</button>
+        </div>
+      </div>
+
+      <div>
+        <h2>Features</h2>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="toggle-row">
+            <input type="checkbox" id="chk-tooltip" onchange="toggleTooltip(this.checked)">
+            <label for="chk-tooltip">Tooltip overlay</label>
+          </div>
+          <div class="toggle-row">
+            <input type="checkbox" id="chk-pulse" onchange="togglePulse(this.checked)">
+            <label for="chk-pulse">Pulse selected muscles</label>
+          </div>
+          <div class="toggle-row">
+            <input type="checkbox" id="chk-anim" onchange="toggleAnimation(this.checked)">
+            <label for="chk-anim">Smooth animations</label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2>Heatmap Demo</h2>
+        <div class="btn-row">
+          <button class="btn-heatmap" onclick="applyHeatmap('workout')">🔥 Workout</button>
+          <button class="btn-heatmap" onclick="applyHeatmap('thermal')">🌡️ Thermal</button>
+          <button class="btn-heatmap" onclick="applyHeatmapGradient()">🌈 Gradient</button>
+          <button class="btn-action" onclick="clearHeatmap()">Clear</button>
+        </div>
+      </div>
+
+      <div class="output" id="output"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // ─── Import SDK ────────────────────────────────────────────────────────
+    import {
+      MuscleMapWidget, HeatmapLegend,
+      MUSCLE_DISPLAY_NAMES, ALL_MUSCLES,
+      setLocale, getMuscleName, getAllMuscleNames,
+    } from '../src/index.ts';
+
+    const container = document.getElementById('muscle-map');
+    let savedData = null;
+    let currentLocale = 'en';
+    let legend = null;
+
+    // ─── Create widget ─────────────────────────────────────────────────────
+    const map = new MuscleMapWidget(container, {
+      gender: 'male',
+      side: 'front',
+      style: 'default',
+      interactive: true,
+      multiSelect: true,
+    });
+
+    // Enable undo/redo
+    map.enableHistory(50);
+
+    // Expose globally for inline onclick handlers
+    window.muscleMap = map;
+
+    // ─── Events ────────────────────────────────────────────────────────────
+    map.on('selectionChange', (muscles) => {
+      updateMuscleList(muscles);
+      updateUndoButtons();
+    });
+
+    map.on('muscleClick', (muscle, side) => {
+      console.log(`Clicked: ${getMuscleName(muscle)} (${side})`);
+    });
+
+    map.on('muscleLongPress', (muscle, side) => {
+      console.log(`Long press: ${getMuscleName(muscle)} (${side})`);
+    });
+
+    map.on('muscleDrag', (muscle, side) => {
+      console.log(`Drag over: ${getMuscleName(muscle)} (${side})`);
+    });
+
+    // ─── UI Functions ──────────────────────────────────────────────────────
+    function updateMuscleList(muscles) {
+      const list = document.getElementById('muscle-list');
+      if (muscles.length === 0) {
+        list.innerHTML = '<div class="info-row">Click on the body to select muscles</div>';
+        return;
+      }
+      list.innerHTML = muscles.map(m =>
+        `<div class="muscle-chip selected">
+          <span>${getMuscleName(m)}</span>
+          <span class="badge">selected</span>
+        </div>`
+      ).join('');
+    }
+
+    function updateUndoButtons() {
+      document.getElementById('btn-undo').disabled = !map.canUndo;
+      document.getElementById('btn-redo').disabled = !map.canRedo;
+    }
+
+    window.setGender = (g) => {
+      map.setGender(g);
+      document.getElementById('btn-male').classList.toggle('active', g === 'male');
+      document.getElementById('btn-female').classList.toggle('active', g === 'female');
+    };
+
+    window.setSide = (s) => {
+      map.setSide(s);
+      document.getElementById('btn-front').classList.toggle('active', s === 'front');
+      document.getElementById('btn-back').classList.toggle('active', s === 'back');
+    };
+
+    window.setStyle = (s) => {
+      map.setStyle(s);
+      ['default', 'neon', 'medical', 'minimal'].forEach(st => {
+        document.getElementById(`btn-style-${st}`).classList.toggle('active', st === s);
+      });
+    };
+
+    window.changeLocale = (locale) => {
+      currentLocale = locale;
+      setLocale(locale);
+      // Re-render muscle list with new locale
+      updateMuscleList(map.getSelectedMuscles());
+      console.log(`Locale changed to: ${locale}`);
+    };
+
+    window.handleSave = () => {
+      const data = map.getHighlightData();
+      savedData = data;
+      const output = document.getElementById('output');
+      output.textContent = JSON.stringify(data, null, 2);
+      output.classList.add('visible');
+    };
+
+    window.handleClear = () => {
+      map.clearHighlights();
+      map.clearSelection();
+      document.getElementById('output').classList.remove('visible');
+      document.getElementById('heatmap-legend').style.display = 'none';
+    };
+
+    window.handleRestore = () => {
+      if (savedData) {
+        map.setHighlightData(savedData);
+        map.selectMany(savedData.map(d => d.muscle));
+      }
+    };
+
+    window.handleUndo = () => {
+      map.undo();
+      updateUndoButtons();
+    };
+
+    window.handleRedo = () => {
+      map.redo();
+      updateUndoButtons();
+    };
+
+    window.toggleTooltip = (on) => {
+      if (on) {
+        map.enableTooltip((muscle, side) => {
+          return `<strong>${getMuscleName(muscle)}</strong><br><span style="opacity:0.6;font-size:11px">${side} side</span>`;
+        });
+      } else {
+        map.disableTooltip();
+      }
+    };
+
+    window.togglePulse = (on) => {
+      if (on) map.enablePulse(1.5, 0.5, 1.0);
+      else map.disablePulse();
+    };
+
+    window.toggleAnimation = (on) => {
+      if (on) map.enableAnimation(300);
+      else map.disableAnimation();
+    };
+
+    window.applyHeatmap = (preset) => {
+      const sampleData = [
+        { muscle: 'chest', intensity: 0.9 },
+        { muscle: 'biceps', intensity: 0.7 },
+        { muscle: 'abs', intensity: 0.6 },
+        { muscle: 'quadriceps', intensity: 0.8 },
+        { muscle: 'deltoids', intensity: 0.5 },
+        { muscle: 'forearm', intensity: 0.3 },
+        { muscle: 'calves', intensity: 0.4 },
+        { muscle: 'trapezius', intensity: 0.55 },
+        { muscle: 'obliques', intensity: 0.35 },
+        { muscle: 'tibialis', intensity: 0.2 },
+      ];
+      map.setHeatmap(sampleData, { colorScale: preset });
+      map.clearSelection();
+      showLegend(preset);
+    };
+
+    window.applyHeatmapGradient = () => {
+      const sampleData = [
+        { muscle: 'chest', intensity: 0.9 },
+        { muscle: 'biceps', intensity: 0.7 },
+        { muscle: 'abs', intensity: 0.6 },
+        { muscle: 'quadriceps', intensity: 0.8 },
+        { muscle: 'deltoids', intensity: 0.5 },
+      ];
+      map.setHeatmap(sampleData, {
+        colorScale: 'thermal',
+        gradientFill: true,
+        gradientDirection: 'topToBottom',
+        gradientLowFactor: 0.2,
+      });
+      map.clearSelection();
+      showLegend('thermal');
+    };
+
+    window.clearHeatmap = () => {
+      map.clearHighlights();
+      map.clearSelection();
+      document.getElementById('heatmap-legend').style.display = 'none';
+    };
+
+    function showLegend(preset) {
+      const legendEl = document.getElementById('heatmap-legend');
+      legendEl.style.display = 'block';
+      legendEl.innerHTML = '';
+      legend = new HeatmapLegend(legendEl, {
+        colorScale: preset,
+        orientation: 'horizontal',
+        barThickness: 12,
+        labelMin: '🔵 Low',
+        labelMax: '🔴 High',
+        steps: 48,
+      });
+    }
+  </script>
+</body>
+</html>

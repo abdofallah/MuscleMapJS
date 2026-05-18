@@ -1,0 +1,44 @@
+{
+  "name": "@abdofallah/musclemap-js",
+  "version": "1.0.0",
+  "description": "Interactive human body muscle map SDK for the web — TypeScript/Canvas port of the MuscleMap SwiftUI SDK",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src/",
+    "demo/",
+    "tsconfig.json",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "dev": "npx -y vite --open demo/index.html",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "muscle-map",
+    "anatomy",
+    "canvas",
+    "svg",
+    "human-body",
+    "interactive",
+    "fitness",
+    "pilates",
+    "workout",
+    "heatmap",
+    "typescript"
+  ],
+  "author": "Abdo Fallah",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abdofallah/MuscleMapJS.git"
+  },
+  "homepage": "https://github.com/abdofallah/MuscleMapJS",
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^6.0.0"
+  }
+}
