@@ -7,6 +7,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen)](package.json)
 
+<p align="center">
+  <img src="screenshots/male_front_default.png" width="200" alt="Male Front — Default style">
+  <img src="screenshots/female_front_neon.png" width="200" alt="Female Front — Neon style with selection">
+  <img src="screenshots/male_heatmap_workout.png" width="200" alt="Male Front — Workout heatmap">
+  <img src="screenshots/male_back_medical.png" width="200" alt="Male Back — Medical style">
+</p>
+
 ---
 
 ## Features
@@ -24,6 +31,11 @@
 - 🎨 **4 style presets** — Default, Minimal, Neon, Medical  
 - 💾 **State serialization** — save/restore highlighted muscles as plain JSON  
 - **Zero dependencies** — pure browser Canvas2D + DOM APIs
+
+<p align="center">
+  <img src="screenshots/tooltip_demo.png" width="300" alt="Tooltip overlay on hover">
+  <img src="screenshots/male_heatmap_workout.png" width="300" alt="Heatmap with legend component">
+</p>
 
 ---
 
@@ -392,7 +404,7 @@ demo/
 
 ## License
 
-[MIT](LICENSE) © 2026 Abdo Fallah
+[MIT](LICENSE) © 2026
 
 ---
 
